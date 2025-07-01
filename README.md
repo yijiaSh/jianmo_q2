@@ -18,7 +18,9 @@
 ### 模型训练时
 模型训练时对应的`user_id`,`blogger_id`作为文本类无法传入模型，
 将训练集和测试集合并后统一`encode`然后新增`user_id_enc`,`blogger_id_enc`列作为训练的特征。
+
 ### 采用`lightGBM`,`XGBoost`模型进行预测
+
 由于样本分布不均匀，其中百万条均是未关注数据，导致传统分类模型直接全部预测为`0`,
 加入`scale_pos_weight=scale_pos_weight`训练分布不均匀目标
 结果如下
@@ -49,8 +51,8 @@ model = xgb.XGBClassifier(
 
 ## 选择能够处理非均匀分布的概率问题
 查看数据分布
-！[数据分布图](./pic/data_distribute.png)
 
+![数据分布图](./assets/data_distribute.png)
 
 ### 选择上采样后效果仍没有提升，调整思路
 
@@ -66,6 +68,7 @@ model = xgb.XGBClassifier(
 然后进行预测看看效果
 
 #### 用户已关注列表
+
 |User ID|Blogger IDs|
 |--|--|
 |U14990|['B13']|
@@ -75,6 +78,12 @@ model = xgb.XGBClassifier(
 |U7|['B12' 'B13' 'B2' 'B4' 'B6' 'B8']|
 
 修改方法后，能够准确预测
+
+#### 目前历史数据采用的特征
+
+![相关性热力图](./assets/%E7%9B%B8%E5%85%B3%E6%80%A7%E7%83%AD%E5%8A%9B%E5%9B%BE.png)
+
+
 
 #### 训练集评估报告
 
@@ -89,11 +98,29 @@ model = xgb.XGBClassifier(
 
 效果不错ROC和PR曲线均达到了1
 
+![ROC和PR曲线](./assets/ROC%E5%92%8CPR%E6%9B%B2%E7%BA%BF.png)
 
-### 预测结果如下
+
+
+#### 预测结果如下
 
 |User ID|new_followed_bloggers|
 |--|--|
 |U52010|B13|
 |U6749|"B13,B24"|
 |U7|B23|
+
+#### 模型解释性分析
+
+![SHAP分析图](./assets/shap_summary_plot.png)
+
+# 问题三
+
+用户与博主之间的互动数为点赞数，评论数，关注数之和，平台制定合理的推荐方案，为用户推送内容，增加用户与博主之间的互动。基于附件1的数据，建立数学模型，预测指定用户在`2024.07.21`是否在线。若在线预测该用户可能与博主产生的互动关系，并给出可能与其产生互动最高的三名博主。
+
+| 用户ID  | U9   | U22405 | U16  | U48420 |
+| :-------: |------ | :----: | :--: | :----: |
+| 博主ID1 |      |        |      |        |
+|博主ID2|||||
+|博主ID3|||||
+
