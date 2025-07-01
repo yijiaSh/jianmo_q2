@@ -10,7 +10,7 @@ df_comment = pd.read_csv('data/pred_comment.csv')[['Blogger ID', '评论_0721_�
 # 合并数据
 df_merged = df_view.merge(df_like, on='Blogger ID').merge(df_comment, on='Blogger ID')
 
-# 加上日期列和占位的关注列（等你第二阶段预测后再填）
+# 加上日期列和占位的关注列（第二阶段预测后再填）
 df_merged['Date'] = '2024-07-21'
 df_merged['关注'] = -1  # 暂时占位，后续可替换为预测值
 
