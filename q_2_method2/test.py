@@ -16,7 +16,28 @@ feature_cols = [
     'fan_count', 'user_count', 'fan_ratio'
 ]
 
+# === Step 2.5: 去除已关注博主的候选交互 ===
+user_followed_dict = {
+    'U14990': ['B13'],
+    'U52010': ['B2', 'B23', 'B3', 'B72'],
+    'U5769': ['B13', 'B19', 'B22', 'B9'],
+    'U6749': ['B44'],
+    'U7': ['B12', 'B13', 'B2', 'B4', 'B6', 'B8']
+}
+
+# 标记是否为已关注博主
+mask = df_pred.apply(
+    lambda row: row['Blogger ID'] in user_followed_dict.get(row['User ID'], []),
+    axis=1
+)
+
+# 去除后重置索引
+df_pred = df_pred[~mask].reset_index(drop=True)
+print(f" 去除已关注博主后的记录数：{len(df_pred)}")
+
+# 注意：此时再提取特征
 X_pred = df_pred[feature_cols]
+
 
 # === Step 3: 加载训练好的模型 ===
 model = joblib.load('q_2_method2/xgb_model.pkl')
@@ -27,12 +48,12 @@ df_pred['pred'] = (df_pred['prob'] >= 0.5).astype(int)
 
 # === Step 5: 筛选预测为“新增关注”的记录 ===
 df_result = df_pred[df_pred['pred'] == 1]
-
+df_result.to_csv('q_2_method2/result.csv', index=False)
 # === Step 6: 限定指定目标用户 ===
 target_users = ['U7', 'U6749', 'U5769', 'U14990', 'U52010']
 df_result = df_result[df_result['User ID'].isin(target_users)]
 
-# === Step 7: 可选：每个用户仅保留 Top-K 高概率记录（如 Top 5） ===
+# === Step 7: 可选：每个用户仅保留 Top-K 高概率记录 ===
 df_result = df_result.sort_values(by=['User ID', 'prob'], ascending=[True, False])
 df_result = df_result.groupby('User ID').head(5)
 

@@ -88,3 +88,12 @@ model = xgb.XGBClassifier(
 |weighted avg    | 0.9863|    0.9828|    0.9837|       233|
 
 效果不错ROC和PR曲线均达到了1
+
+
+### 预测结果如下
+
+|User ID|new_followed_bloggers|
+|--|--|
+|U52010|B13|
+|U6749|"B13,B24"|
+|U7|B23|
